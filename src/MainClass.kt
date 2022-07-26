@@ -4,6 +4,8 @@ import models.Bill
 import models.Transaction
 
 
+val transactionsBatch:ArrayList<Transaction> = ArrayList()
+
 fun main() {
     val bill = Bill()
     bill.addItem(FoodItems.SODA.itemId,3)
