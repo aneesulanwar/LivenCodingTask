@@ -4,27 +4,25 @@ import enums.PaymentType
 import repositories.ItemPriceRepositories
 
 class Bill {
-    private val items:ArrayList<Item> = ArrayList()
+    private val items:HashMap<Int,Int> = hashMapOf()
     private var discount:Float = 0f
     private var surCharge:Float = 0f
     private var paymentType:Int = PaymentType.BY_CASH.paymentTye //Default payment Type
-    val itemRepository = ItemPriceRepositories()
-    var total:Double = 0.0
-    var tax:Double = 0.0
-    var isDiscountPercentage = false
+    private val itemRepository = ItemPriceRepositories()
+    private var subTotal:Double = 0.0
+    private var total:Double = 0.0
+    private var tax:Double = 0.0
+    private var isDiscountPercentage = false
     companion object{
         const val CARD_SURCHARGE = 1.2f
     }
 
-    fun addItem(item: Item){
-        items.add(item)
+    fun addItem(itemId: Int,quantity:Int){
+        items[itemId] = quantity
     }
 
-    fun addItems(items: List<Item>){
-        this.items.addAll(items)
-    }
 
-    fun getItems():ArrayList<Item>{
+    fun getItems():HashMap<Int,Int>{
         return this.items
     }
 
@@ -56,10 +54,15 @@ class Bill {
         return this.surCharge
     }
 
-    fun getTotalAmount():Double{
+    fun getSubTotalAmount():Double{
         for (item in items){
-            total += itemRepository.getItemPrice(item.getId())
+            subTotal += (itemRepository.getItemPrice(item.key)*item.value) //item multiply with quantity
         }
+        return subTotal
+    }
+
+    fun getTotal():Double{
+        total = subTotal
         applySurcharge()
         applyDiscount()
         return total
@@ -74,10 +77,18 @@ class Bill {
     }
 
     fun applySurcharge(){
-        total+= total*surCharge
+        total+= (total/100)*surCharge
+    }
+
+    fun getIsDisountPercentage():Boolean{
+        return isDiscountPercentage
     }
 
     fun calculateTax(){
         //no-info about the tax is provided in the document
+    }
+
+    fun generateInvoices(){
+
     }
 }

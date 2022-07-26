@@ -1,6 +1,6 @@
 package enums
 
-enum class FoodItems(val foodId:Int) {
+enum class FoodItems(val itemId:Int) {
     BIG_BREKKIE(1),
     BRUSCHETTA(2),
     POACHED_EGGS(3),
