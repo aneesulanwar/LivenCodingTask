@@ -6,40 +6,47 @@ import repositories.ItemPriceRepositories
 import java.util.concurrent.atomic.AtomicInteger
 
 class Transaction {
-    val itemRepository = ItemPriceRepositories()
 
     companion object {
         private val count: AtomicInteger = AtomicInteger(1)
+        val itemRepository = ItemPriceRepositories()
     }
 
     private val id = count.getAndIncrement()
-    private var bill:Bill? = null
-
-    fun setBill(bill: Bill) {
-        this.bill = bill
-    }
-
-    fun getBill():Bill{
-        return this.bill?: Bill()
-    }
+    private var paidAmount = 0.0
+    private var returnedAmount = 0.0
+    private var remainingAmount = 0.0
 
     fun getId():Int{
         return this.id
     }
 
-    fun printInvoice(){
-        println("Invoice# \t $id")
-        println("Payment Type \t ${if(bill?.getPaymentType()==PaymentType.BY_CASH.paymentTye)"BY CASH" else "BY CARD"}")
-        println("Items")
-        println("Item No \t\t Item ID \t\t Item Name \t\t Price \t\t Quantity")
-        var itemNo = 1
-        for (item in bill?.getItems()?: hashMapOf()){
-            println("$itemNo \t\t ${item.key} \t\t ${itemRepository.getItemName(item.key)} \t\t $${itemRepository.getItemPrice(item.key)} \t\t ${item.value}")
-            ++itemNo
-        }
-        println("Sub Total \t\t\t\t\t\t $${bill?.getSubTotalAmount()?:0.0}")
-        println("Surcharge \t\t\t\t\t\t $${bill?.getSurcharge()}%")
-        println("Discount \t\t\t\t\t\t $${if(bill?.getIsDisountPercentage() != false)bill?.getDiscount().toString() + '%' else bill?.getDiscount().toString()}")
-        println("Total Amount \t\t\t\t\t\t $${bill?.getTotal()?:0.0}")
+    fun printTransaction(){
+        println("Transaction# \t $id \t\t Amount Paid \t $$paidAmount \t\t Amount Returned \t $$returnedAmount \t\t Amount Remaining \t $$remainingAmount")
+    }
+
+    fun setPaidAmount(value:Double){
+        this.paidAmount = value
+    }
+
+    fun setReturnedAmount(value:Double){
+        this.returnedAmount = value
+        this.remainingAmount = paidAmount - returnedAmount
+    }
+
+    fun setRemainingAmount(value:Double){
+        this.remainingAmount = value
+    }
+
+    fun getRemainingAmount():Double{
+        return this.remainingAmount
+    }
+
+    fun getReturnedAmount():Double{
+        return this.returnedAmount
+    }
+
+    fun getPaidAmount():Double{
+        return this.paidAmount
     }
 }

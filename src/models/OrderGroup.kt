@@ -3,37 +3,59 @@ package models
 import enums.PaymentType
 import enums.SplitTypes
 
-class OrderGroup {
-    private var noOfUsers:Int = 0
-    private var splitType:Int = SplitTypes.SPLIT_EQUALLY.split //default type
-    private val orderedItems:HashMap<Int,Int> = hashMapOf()// stores (ItemId,Quantity)
-    private val userOrders:HashMap<Int,MutableMap<Int,Int>> = hashMapOf() //(userid,(itemId,quantity)) stores items ordered by each user and item's quantity for individual split
-    private val transactionsBatch:ArrayList<Transaction> = ArrayList()
-    private var paymentChoices:HashMap<Int,Int> = hashMapOf() //payment choices of users
+open class OrderGroup {
+    protected var noOfCustomers = 0
+    protected val orderedItems:HashMap<Int,Int> = hashMapOf()// stores (ItemId,Quantity)
+    protected val bill:Bill = Bill()
+    protected var paymentType:Int = PaymentType.BY_CASH.paymentTye //default value is by cash
+    protected val transactionsBatch:ArrayList<Transaction> = ArrayList()
+    protected var tabAmount:Double = 0.0
+    protected var discount:Float = 0f
+    protected var isDiscountPercentage = false
 
     fun addTransaction(transaction: Transaction){
         this.transactionsBatch.add(transaction)
     }
 
-    fun setSplitType(split:Int){
-        this.splitType = splitType
+    fun setTabAmountValue(value:Double){
+        this.tabAmount = value
     }
 
-    fun setPaymentType(userId:Int,paymentType:Int){
-        paymentChoices[userId] = paymentType
-    }
 
     fun addItemToOrder(itemId:Int,quantity:Int){
         orderedItems[itemId] = quantity
     }
 
-    fun addUserItem(itemId: Int,userId: Int,quantity: Int){
-        if (userOrders[userId]!=null){
-            userOrders[userId]?.set(itemId, quantity)
-        }else{
-            userOrders[userId] = mutableMapOf()
-            userOrders[userId]?.set(itemId,quantity)
+
+    open fun processOrder(){
+        //each sub type process order accordingly
+    }
+
+    fun setDiscount(value: Float,isDiscountPercentage:Boolean){
+        this.discount = value
+        this.isDiscountPercentage = isDiscountPercentage
+    }
+
+    open fun executeTransactions(){
+        for (transaction in transactionsBatch){
+            transaction.printTransaction()
         }
+    }
+
+    fun printInvoice(groupNo:Int){
+        bill.printInvoice(groupNo)
+    }
+
+    open fun payment(){
+
+    }
+
+    fun setPaymentTypeValue(value:Int){
+        this.paymentType = value
+    }
+
+    fun setCustomersNumber(value:Int){
+        this.noOfCustomers = value
     }
 
 }
